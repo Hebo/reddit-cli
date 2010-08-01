@@ -1,21 +1,18 @@
 import urwid
-import pages
+from pages import Story, get_stories
 
 class MainWindow(object):
 	"""manages main window elements"""
 	def __init__(self):
-		self.stories = None
+		self.stories = []
 		self.load_stories()
 		
 	def load_stories(self, subreddit=None):
 		"""load or update stories from specified subreddit"""
-		story1 = urwid.Text(('body', "WHOA - neo, the matrix\n    500 votes    5 comments"))
-		story2 = urwid.Text(('body', "neo enters the matrix\n    555 votes   1000 comments"))
-		
-		story1 = urwid.Padding(story1, left=1, right=1)
-		story2 = urwid.Padding(story2, left=1, right=1)
-		
-		self.stories = [story1, story2]
+		self.stories = []
+		for s in get_stories():
+			current = urwid.Text( ('body', str(s)), wrap='clip' )
+			self.stories.append( urwid.Padding(current, left=1, right=1) )
 		
 	def get_widget(self):
 		"""return widget comprised of all stories"""
@@ -41,16 +38,13 @@ def main():
 	footer_content = urwid.Text(('footer', "status: reddit gold required"))	
 	footer_content = urwid.Padding(footer_content, left=1, right=1)
 		
-		
 	body = MainWindow()
 	body.load_stories()
 	
-	# Ceate frame for main window layout
+	# Create frame for main window layout
 	frame = urwid.Frame(	body.get_widget(),
 							header=header_content, 
 							footer=footer_content )
-
-
 
 	def input_handler(input):
 	    if input is 'u':
