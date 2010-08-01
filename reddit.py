@@ -10,7 +10,7 @@ class MainWindow(object):
 	def load_stories(self, subreddit=None):
 		"""load or update stories from specified subreddit"""
 		self.stories = []
-		for s in get_stories():
+		for s in get_stories(subreddit):
 			current = urwid.Text( ('body', str(s)), wrap='clip' )
 			self.stories.append( urwid.Padding(current, left=1, right=1) )
 		

@@ -13,6 +13,10 @@ class Story:
 	def __init__(self, object):
 		"""create story from dict object representation"""
 		self.object = object
+		
+		# replace "smart quotes" which cause encode to choke
+		self.title = self.title.replace(u"\u2019", "'")
+		
 
 	def __getattr__(self, name):
 		"""pull elements directly from the stored object"""
@@ -33,10 +37,13 @@ class Story:
 
 		
 
-def get_stories():
+def get_stories(subreddit):
 	"""download json from reddit and return list of stories"""
 	try:
-		req = urllib2.Request("http://www.reddit.com/.json")
+		if subreddit is None: url = "http://www.reddit.com/.json"
+		else: url = "http://www.reddit.com/r/" + subreddit + "/.json"
+			
+		req = urllib2.Request( url )
 		opener = urllib2.build_opener()
 		f = opener.open(req)
 		stories_raw = json.loads(f.read())
