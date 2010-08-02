@@ -30,22 +30,20 @@ class MainWindow(object):
 		"""load or update stories from specified subreddit"""
 		self.listings = []
 		for s in get_stories(subreddit):
-			current = Listing( s )
-			self.listings.append( urwid.Padding(current, left=1, right=1) )
+			current = Listing(s)
+			self.listings.append(urwid.Padding(current, left=1, right=1))
 		
 	def get_widget(self):
 		"""return widget comprised of all listings"""
 		listings_formatted = self.listings[:]
-		# Separate stories with blank line
-		for story in listings_formatted[:]:
-			index = listings_formatted.index(story)
-			if index != len(listings_formatted) - 1:
-				listings_formatted.insert(index + 1, urwid.Divider(" "))
-		listings_formatted.insert(0, urwid.Divider(" "))
-		# Highlight stories when focused
-		self.listings_active = urwid.ListBox( urwid.SimpleListWalker(
-							[urwid.AttrMap(w, None, 'focus') for w in listings_formatted]
-							))
+			
+		# Separate stories with blank line & highlight on focus
+		for (i, l) in enumerate(listings_formatted):
+			filled = urwid.Filler(urwid.AttrMap(l, None, 'focus'))
+			listings_formatted[i] = urwid.BoxAdapter(filled, 3)
+		listings_formatted.append(urwid.Divider("*"))
+		
+		self.listings_active = urwid.ListBox(urwid.SimpleListWalker(listings_formatted))
 		return self.listings_active
 
 
