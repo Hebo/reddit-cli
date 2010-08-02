@@ -8,6 +8,7 @@ Keys:
  * o or Enter: open link in system default webbrowser
  * O: open link in lynx
  * q: quit
+ * b: boss mode
 
 
 While unfinished at present, reddit-cli will eventually allow you to:

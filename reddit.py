@@ -83,7 +83,9 @@ def main():
                 print focus
                 if key == 'j':
                     raise Exception, (focus.index(), dir(focus.index))
-            if key == 'q':
+            elif key == 'b': # boss mode
+                os.system("man python")
+            elif key == 'q':
                 raise urwid.ExitMainLoop()
             return keys
 
