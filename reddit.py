@@ -16,7 +16,7 @@ class Listing(urwid.FlowWidget):
 			pass
 		# pad lines to column width
 		fill = lambda x: x.ljust(maxcol)
-		return urwid.TextCanvas( text=list( map(fill, self.lines) ) )
+		return urwid.TextCanvas(text=list(map(fill, self.lines)))
 	def keypress(self, size, key):
 		return key
 

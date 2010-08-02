@@ -34,10 +34,10 @@ def unescape(text):
 		
 		
 class Story:
-	"""listing of a single reddit story"""
+	"""holds json data of a single reddit story"""
 	def __init__(self, object):
 		"""create story from dict object representation"""
-		assert type(object) is dict
+		assert isinstance(object, dict), "json object is not a dict: %s" % type(object)
 		self.object = object
 		
 	def __getattr__(self, name):
@@ -52,7 +52,7 @@ class Story:
 		line1 = "{0}".format(unescape(
 							smart_truncate(self.title.encode('utf-8'), length=76)
 							))
-		line2 = "{0} points	  {1} comments	 {2}   {3}".format(
+		line2 = "{0} points   {1} comments   {2}   {3}".format(
 									self.score,
 									self.num_comments,
 									self.domain,
@@ -72,12 +72,11 @@ def get_stories(subreddit):
 	try:
 		f = opener.open(req)
 		stories_raw = json.loads(f.read())
-
-		stories = []
-		for i in stories_raw['data']['children']:
-			stories.append(Story(i['data']))
-		return stories
-	except Exception as e:
-		raise Exception, "Error getting reddit listings"
+	except urllib2.HTTPError as e:
+		raise e, "HTTPError getting reddit listings"
+	stories = []
+	for i in stories_raw['data']['children']:
+		stories.append(Story(i['data']))
+	return stories
 	
 	
