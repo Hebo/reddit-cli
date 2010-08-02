@@ -1,4 +1,6 @@
 import urwid
+import webbrowser
+import os
 from pages import Story, get_stories
 
 class Listing(urwid.FlowWidget):
@@ -18,7 +20,12 @@ class Listing(urwid.FlowWidget):
         fill = lambda x: x.ljust(maxcol)
         return urwid.TextCanvas(text=list(map(fill, self.lines)))
     def keypress(self, size, key):
-        return key
+        if key in ('o', 'enter'):
+            webbrowser.open(self.story.url)
+        elif key == 'O':
+            os.system("lynx " + self.story.url)
+        else:
+            return key
 
 class MainWindow(object):
     """manages main window elements"""
@@ -57,7 +64,7 @@ def main():
 
     # Set up header and footer ui widgets 
     header_content = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
-    footer_content = urwid.Text(('footer', "status: reddit gold required")) 
+    footer_content = urwid.Text(('footer', "o/O:open q:quit")) 
     footer_content = urwid.Padding(footer_content, left=1, right=1)
         
     body = MainWindow()
@@ -76,7 +83,7 @@ def main():
                 print focus
                 if key == 'j':
                     raise Exception, (focus.index(), dir(focus.index))
-            if key == 'enter':
+            if key == 'q':
                 raise urwid.ExitMainLoop()
             return keys
 

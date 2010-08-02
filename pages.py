@@ -67,7 +67,7 @@ def get_stories(subreddit):
         url = "http://www.reddit.com/.json"
     else: 
         url = "http://www.reddit.com/r/" + subreddit + "/.json"
-    req = urllib2.Request( url )
+    req = urllib2.Request(url)
     opener = urllib2.build_opener()
     try:
         f = opener.open(req)
