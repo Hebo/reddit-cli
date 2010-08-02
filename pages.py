@@ -28,7 +28,7 @@ class Story:
 	def __str__(self):
 		"""prepare story as a two-line string"""
 		return "{0}\n{1} points   {2} comments   {3}   {4}".format(
-									smart_truncate(self.title, length=76), 
+									smart_truncate(self.title.encode('utf-8'), length=76), 
 									self.score,
 									self.num_comments,
 									self.domain,

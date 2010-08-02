@@ -23,38 +23,49 @@ class MainWindow(object):
 			if index != len(stories_formatted) - 1:
 				stories_formatted.insert(index + 1, urwid.Divider(" "))
 		stories_formatted.insert(0, urwid.Divider(" "))
-		return urwid.ListBox(urwid.SimpleListWalker(stories_formatted))
-			
+		# Highlight stories when focused
+		self.stories_active = urwid.ListBox( urwid.SimpleListWalker(
+							[urwid.AttrMap(w, None, 'focus') for w in stories_formatted]
+							))
+		return self.stories_active
+
 
 def main():
-	palette = 	[
+	palette =	[
 				('header', 'dark magenta,bold', 'default'),
 				('footer', 'white,bold', 'dark red'),
 				('body', 'light gray', 'default'),
+				('focus', 'black', 'dark cyan', 'standout')
 				]
 
 	# Set up header and footer ui widgets 
 	header_content = urwid.Text(('header', "RedditCLI - http://github.com/cev/redditcli"), align='center')
-	footer_content = urwid.Text(('footer', "status: reddit gold required"))	
+	footer_content = urwid.Text(('footer', "status: reddit gold required")) 
 	footer_content = urwid.Padding(footer_content, left=1, right=1)
 		
 	body = MainWindow()
 	body.load_stories()
 	
 	# Create frame for main window layout
-	frame = urwid.Frame(	body.get_widget(),
+	main_widget = body.get_widget()
+	frame = urwid.Frame(	main_widget,
 							header=header_content, 
 							footer=footer_content )
 
-	def input_handler(input):
-	    if input is 'u':
-			body.load_stories()
-	    if input == 'enter':
-	        raise urwid.ExitMainLoop()
+	def input_handler(keys, raw):
+		for key in keys:
+			if key in ('j','k'):
+				focus = main_widget.get_focus()
+				print focus
+				if key == 'j':
+					raise Exception, (focus.index(), dir(focus.index))
+			if key == 'enter':
+				raise urwid.ExitMainLoop()
+			#return keys
 
 	# Start ui 
-	loop = urwid.MainLoop(frame, palette, unhandled_input=input_handler)
+	loop = urwid.MainLoop(frame, palette, input_filter=input_handler)
 	loop.run()
 
 if __name__ == "__main__":
-    main()
+	main()
