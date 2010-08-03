@@ -5,7 +5,7 @@ reddit-cli is a tool that lets you browse reddit.com and follow links from a com
 
 Usage
 ----- 
-run `python2.7 reddit-cli.py`
+Run with `./reddit-cli`
 
 Keys
 ----
