@@ -5,12 +5,13 @@ reddit-cli is a tool that lets you browse reddit.com and follow links from a com
 
 Keys:
 
- * `o` or `Enter` : open link in system default webbrowser
+ * `o,Enter` : open link in system default webbrowser
  * `O` : open link in lynx
  * `q` : quit
  * `b` : boss mode (executes `man python` by default)
  * `u` : refresh
  * `s` : open subreddit
+ * `j,k` or arrow keys : scroll
 
 
 While unfinished at present, reddit-cli will eventually allow you to:
