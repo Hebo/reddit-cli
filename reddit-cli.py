@@ -1,7 +1,7 @@
 import urwid
 import webbrowser
 import os
-from pages import Story, get_stories, BadSubredditError
+from pages import Story, download_stories, BadSubredditError
 
 class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
@@ -23,7 +23,7 @@ class Listing(urwid.FlowWidget):
         if key in ('o', 'enter'):
             webbrowser.open(self.story.url)
         elif key == 'O':
-            os.system("lynx " + self.story.url)
+            os.system("lynx -accept_all_cookies " + self.story.url)
         else:
             return key
 
@@ -47,7 +47,7 @@ class MainWindow(object):
     def __load_stories(self):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
-        for s in get_stories(self.subreddit):
+        for s in download_stories(self.subreddit):
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
         

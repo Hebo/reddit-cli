@@ -60,10 +60,12 @@ class Story:
                                     )
         return (line1, line2)
 
+
 class BadSubredditError(Exception):
     pass
+
     
-def get_stories(subreddit):
+def download_stories(subreddit):
     """download json from reddit and return list of stories"""
     if subreddit is None: 
         url = "http://www.reddit.com/.json"

@@ -36,21 +36,21 @@ class TestStory(unittest.TestCase):
     pass
 
 
-class TestGetStories(unittest.TestCase):
+class TestDownloadStories(unittest.TestCase):
     
     def testBadSubredditError(self):
         """should raise a BadSubredditError"""
-        self.assertRaises(pages.BadSubredditError, pages.get_stories, "qwer345g63")
-        self.assertRaises(pages.BadSubredditError, pages.get_stories, "qwer3 45g 63")
-        self.assertRaises(pages.BadSubredditError, pages.get_stories, "78b@$@#$@#   @ 42 4 7cs")
+        self.assertRaises(pages.BadSubredditError, pages.download_stories, "qwer345g63")
+        self.assertRaises(pages.BadSubredditError, pages.download_stories, "qwer3 45g 63")
+        self.assertRaises(pages.BadSubredditError, pages.download_stories, "78b@$@#$@#   @ 42 4 7cs")
 
     def testReturnList(self):
         """should return a list"""
-        self.assertIsInstance(pages.get_stories(None), list)
+        self.assertIsInstance(pages.download_stories(None), list)
 
     def testReturnStories(self):
         """should return a list of stories"""
-        for s in pages.get_stories(None):
+        for s in pages.download_stories(None):
             self.assertIsInstance(s, pages.Story)
      
         
