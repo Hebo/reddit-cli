@@ -66,7 +66,7 @@ def main():
 
     # Set up header and footer ui widgets 
     header = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
-    footer_content = urwid.Text(('footer', "o/O:open s:subreddit u:refresh q:quit")) 
+    footer_content = urwid.Text(('footer', "o/O:open s:subreddit u:refresh j,k: scroll q:quit")) 
     footer = urwid.Padding(footer_content, left=1, right=1)
     textentry = urwid.Edit()
     assert textentry.get_text() == ('', []), textentry.get_text()
@@ -107,16 +107,14 @@ def main():
         for key in keys:
             if key == 's':
                 # Replace status footer wth edit widget
-                textentry.set_caption(('textentry', ' [subreddit?] >'))
+                textentry.set_caption(('textentry', ' [subreddit] ?>'))
                 frame.set_footer(urwid.Padding(textentry, left=4))
                 frame.set_focus('footer')
                 loop.input_filter = edit_handler
                 return
             elif key in ('j','k'):
-                focus = main_widget.get_focus()
-                print focus
-                if key == 'j':
-                    raise Exception, (focus.index(), dir(focus.index))
+                direction = 'down' if key == 'j' else 'up'
+                return [direction]
             elif key == 'u':
                 refresh()
             elif key == 'b': # boss mode
