@@ -60,20 +60,28 @@ class Story:
                                     )
         return (line1, line2)
 
-        
+class BadSubredditError(Exception):
+    pass
+    
 def get_stories(subreddit):
     """download json from reddit and return list of stories"""
     if subreddit is None: 
         url = "http://www.reddit.com/.json"
     else: 
         url = "http://www.reddit.com/r/" + subreddit + "/.json"
-    req = urllib2.Request(url)
-    opener = urllib2.build_opener()
+    
+    stream = None
     try:
-        f = opener.open(req)
-        stories_raw = json.loads(f.read())
-    except urllib2.HTTPError as e:
-        raise e, "HTTPError getting reddit listings"
+        stream = urllib2.urlopen(url)
+    except urllib2.HTTPError as err:
+        if err.getcode() in (400,404):
+            raise BadSubredditError
+        else:
+            raise
+    if re.search(r'/search\?q=', stream.url):
+        raise BadSubredditError
+    
+    stories_raw = json.loads(stream.read())
     stories = []
     for i in stories_raw['data']['children']:
         stories.append(Story(i['data']))

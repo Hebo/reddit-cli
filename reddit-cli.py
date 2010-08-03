@@ -1,7 +1,7 @@
 import urwid
 import webbrowser
 import os
-from pages import Story, get_stories
+from pages import Story, get_stories, BadSubredditError
 
 class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
@@ -64,7 +64,7 @@ class MainWindow(object):
         self.listings_active = urwid.ListBox(urwid.SimpleListWalker(listings_formatted))
         return self.listings_active
         
-    def format_status(self):
+    def __format_status(self):
         """format status text for use in footer"""
         if self.subreddit is None:
             subreddit_text = "/r/front_page"
@@ -72,13 +72,26 @@ class MainWindow(object):
             subreddit_text = "/r/" + self.subreddit
         status = "[{0}] o/O:open s:subreddit u:refresh j/k: scroll q:quit".format(subreddit_text)
         return status
+    
+    def set_status(self, message=None):
+        """write message on footer or else default status string"""
+        if message is None:
+            status = self.__format_status()
+        else:
+            status = message
+        self.footer_content.set_text(('footer', status))
         
     def refresh(self):
         """reload stories in main window"""
-        self.__load_stories()
+        try:
+            self.__load_stories()
+        except BadSubredditError:
+            self.set_status("Error loading subreddit!")
+            return
         main_widget = self.__get_widget()
         self.frame.set_body(main_widget)
-        self.footer_content.set_text(('footer', self.format_status()))
+        self.set_status()
+        
             
 
 def main():
