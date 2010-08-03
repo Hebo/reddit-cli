@@ -26,10 +26,10 @@ class TestMainWindow(unittest.TestCase):
         """should switch subreddits"""
         self.main_window.refresh()
         before = self.main_window.listings
-        self.main_window.subreddit = "gaming"
-        self.main_window.refresh()
+        self.main_window.set_subreddit("gaming")
         after = self.main_window.listings
         self.assertNotEquals(before, after)
+        self.assertEquals(self.main_window._MainWindow__subreddit, "gaming")
 
         
 class TestStory(unittest.TestCase):

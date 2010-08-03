@@ -32,7 +32,7 @@ class MainWindow(object):
     """manages main window elements"""
     def __init__(self):
         self.listings = []
-        self.subreddit = None
+        self.__subreddit = None
         self.__load_stories()
         
         # Prep header and footer ui widgets 
@@ -43,11 +43,17 @@ class MainWindow(object):
         self.frame = urwid.Frame(   self.__get_widget(),
                                     header=self.header, 
                                     footer=self.footer )
-                                         
+    
+    def set_subreddit(self, subreddit):
+        """switch subreddits"""
+        self.__subreddit = subreddit
+        self.set_status("Loading subreddit: /r/{0}".format(subreddit))
+        self.refresh()
+                                           
     def __load_stories(self):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
-        for s in download_stories(self.subreddit):
+        for s in download_stories(self.__subreddit):
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
         
@@ -66,11 +72,11 @@ class MainWindow(object):
         
     def __format_status(self):
         """format status text for use in footer"""
-        if self.subreddit is None:
+        if self.__subreddit is None:
             subreddit_text = "/r/front_page"
         else:
-            subreddit_text = "/r/" + self.subreddit
-        status = "[{0}] o/O:open s:subreddit u:refresh j/k: scroll q:quit".format(subreddit_text)
+            subreddit_text = "/r/" + self.__subreddit
+        status = "[{0}] o/O:open s:subreddit u:refresh j/k:scroll q:quit".format(subreddit_text)
         return status
     
     def set_status(self, message=None):
@@ -106,6 +112,7 @@ def main():
     textentry = urwid.Edit()
     assert textentry.get_text() == ('', []), textentry.get_text()   
     
+    print "Loading..."
     body = MainWindow()
     body.refresh()
         
@@ -114,10 +121,9 @@ def main():
         if keys in (['enter'],[]):
             if keys == ['enter']:
                 if textentry.get_text()[0] != '':
-                    body.subreddit = textentry.edit_text
+                    body.set_subreddit(textentry.edit_text)
                     textentry.set_edit_text('')
-                    body.refresh() 
-            # Restore original footer
+            # Restore original status footer
             body.frame.set_footer(body.footer)
             body.frame.set_focus('body')
             loop.input_filter = input_handler
@@ -141,7 +147,7 @@ def main():
                 body.refresh()
             elif key == 'b': # boss mode
                 os.system("man python")
-            elif key == 'q':
+            elif key == 'q': # quit
                 raise urwid.ExitMainLoop()
             return keys
 
