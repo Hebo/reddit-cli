@@ -53,6 +53,17 @@ class MainWindow(object):
         
         self.listings_active = urwid.ListBox(urwid.SimpleListWalker(listings_formatted))
         return self.listings_active
+        
+    def format_status(self):
+        """format status text for use in footer"""
+        if self.subreddit is None:
+            subreddit_text = "/r/front_page"
+        else:
+            subreddit_text = "/r/" + self.subreddit
+        status = "[{0}] o/O:open s:subreddit u:refresh j/k: scroll q:quit".format(subreddit_text)
+        return status
+            
+        
 
 
 def main():
@@ -64,14 +75,16 @@ def main():
                 ('focus', 'black', 'dark cyan', 'standout')
                 ]
 
-    # Set up header and footer ui widgets 
+    # Prep header and footer ui widgets 
     header = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
-    footer_content = urwid.Text(('footer', "o/O:open s:subreddit u:refresh j,k: scroll q:quit")) 
+    footer_content = urwid.Text(('footer', "")) 
     footer = urwid.Padding(footer_content, left=1, right=1)
     textentry = urwid.Edit()
     assert textentry.get_text() == ('', []), textentry.get_text()
         
     body = MainWindow()
+    
+    footer_content.set_text(('footer', body.format_status()))
     
     # Create frame for main window layout
     main_widget = body.get_widget()
@@ -83,6 +96,7 @@ def main():
         body.load_stories()
         main_widget = body.get_widget()
         frame.set_body(main_widget)
+        footer_content.set_text(('footer', body.format_status()))
         
     def edit_handler(keys, raw):
         """respond to keys while user is editing text"""      
