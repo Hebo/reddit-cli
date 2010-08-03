@@ -27,22 +27,32 @@ class Listing(urwid.FlowWidget):
         else:
             return key
 
+
 class MainWindow(object):
     """manages main window elements"""
     def __init__(self):
         self.listings = []
         self.subreddit = None
-        self.load_stories()
-                
-    def load_stories(self):
-        """load or update stories from (sub)reddit"""
+        self.__load_stories()
+        
+        # Prep header and footer ui widgets 
+        self.header = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
+        self.footer_content = urwid.Text(('footer', "")) 
+        self.footer = urwid.Padding(self.footer_content, left=1, right=1)
+        
+        self.frame = urwid.Frame(   self.__get_widget(),
+                                    header=self.header, 
+                                    footer=self.footer )
+                                         
+    def __load_stories(self):
+        """load stories from (sub)reddit and store Listings"""
         self.listings = []
         for s in get_stories(self.subreddit):
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
         
-    def get_widget(self):
-        """return widget comprised of all listings"""
+    def __get_widget(self):
+        """return TextBox widget containing all Listings"""
         listings_formatted = self.listings[:]
             
         # Separate stories with blank line & highlight on focus
@@ -62,9 +72,14 @@ class MainWindow(object):
             subreddit_text = "/r/" + self.subreddit
         status = "[{0}] o/O:open s:subreddit u:refresh j/k: scroll q:quit".format(subreddit_text)
         return status
-            
         
-
+    def refresh(self):
+        """reload stories in main window"""
+        self.__load_stories()
+        main_widget = self.__get_widget()
+        self.frame.set_body(main_widget)
+        self.footer_content.set_text(('footer', self.format_status()))
+            
 
 def main():
     palette =   [
@@ -75,43 +90,23 @@ def main():
                 ('focus', 'black', 'dark cyan', 'standout')
                 ]
 
-    # Prep header and footer ui widgets 
-    header = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
-    footer_content = urwid.Text(('footer', "")) 
-    footer = urwid.Padding(footer_content, left=1, right=1)
     textentry = urwid.Edit()
-    assert textentry.get_text() == ('', []), textentry.get_text()
-        
+    assert textentry.get_text() == ('', []), textentry.get_text()   
+    
     body = MainWindow()
-    
-    footer_content.set_text(('footer', body.format_status()))
-    
-    # Create frame for main window layout
-    main_widget = body.get_widget()
-    frame = urwid.Frame(    main_widget,
-                            header=header, 
-                            footer=footer )
-    def refresh():
-        """reload stories in main window"""
-        body.load_stories()
-        main_widget = body.get_widget()
-        frame.set_body(main_widget)
-        footer_content.set_text(('footer', body.format_status()))
+    body.refresh()
         
     def edit_handler(keys, raw):
         """respond to keys while user is editing text"""      
         if keys in (['enter'],[]):
             if keys == ['enter']:
                 if textentry.get_text()[0] != '':
-                    # Parse actual input out of get_text amalgamation
-                    # user_input = textentry.get_text()[0][textentry.get_text()[1][0][1]:]
                     body.subreddit = textentry.edit_text
-                    body.load_stories()
                     textentry.set_edit_text('')
-                    refresh() 
+                    body.refresh() 
             # Restore original footer
-            frame.set_footer(footer)
-            frame.set_focus('body')
+            body.frame.set_footer(body.footer)
+            body.frame.set_focus('body')
             loop.input_filter = input_handler
             return
         return keys
@@ -122,15 +117,15 @@ def main():
             if key == 's':
                 # Replace status footer wth edit widget
                 textentry.set_caption(('textentry', ' [subreddit] ?>'))
-                frame.set_footer(urwid.Padding(textentry, left=4))
-                frame.set_focus('footer')
+                body.frame.set_footer(urwid.Padding(textentry, left=4))
+                body.frame.set_focus('footer')
                 loop.input_filter = edit_handler
                 return
             elif key in ('j','k'):
                 direction = 'down' if key == 'j' else 'up'
                 return [direction]
             elif key == 'u':
-                refresh()
+                body.refresh()
             elif key == 'b': # boss mode
                 os.system("man python")
             elif key == 'q':
@@ -138,7 +133,7 @@ def main():
             return keys
 
     # Start ui 
-    loop = urwid.MainLoop(frame, palette, input_filter=input_handler)
+    loop = urwid.MainLoop(body.frame, palette, input_filter=input_handler)
     loop.run()
 
 if __name__ == "__main__":
