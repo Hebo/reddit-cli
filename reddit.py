@@ -8,10 +8,13 @@ class Listing(urwid.FlowWidget):
     def __init__(self, story):
         self.story = story
         self.lines = story.format_lines()
+        
     def selectable(self):
         return True
+        
     def rows(self, size, focus=False):
         return 2
+
     def render(self, size, focus=False):
         (maxcol,) = size
         if focus:
@@ -19,11 +22,17 @@ class Listing(urwid.FlowWidget):
         # pad lines to column width
         fill = lambda x: x.ljust(maxcol)
         return urwid.TextCanvas(text=list(map(fill, self.lines)))
+
     def keypress(self, size, key):
         if key in ('o', 'enter'):
             webbrowser.open(self.story.url)
         elif key == 'O':
-            os.system("lynx -accept_all_cookies " + self.story.url)
+            if self.story.domain[:5] == "self.":
+                # Lynx renders mobile reddit better
+                url = "http://m.reddit.com" + self.story.permalink
+            else:
+                url = self.story.url
+            os.system("lynx -accept_all_cookies " + url)
         else:
             return key
 
