@@ -12,8 +12,8 @@ Keys
 
  * `o,Enter` : open link in system default webbrowser
  * `O` : open link in lynx
- * `c` : open comment thread in browser
- * `C` : open comment thread in lynx
+ * `h` : open comment thread in browser
+ * `l` : open comment thread in lynx
  * `q` : quit
  * `b` : boss mode (executes `man python` by default)
  * `u` : refresh

@@ -33,9 +33,9 @@ class Listing(urwid.FlowWidget):
             else:
                 url = self.story.url
             os.system("lynx -accept_all_cookies " + url)
-        elif key == 'c':
+        elif key == 'h':
             webbrowser.open("http://www.reddit.com" + self.story.permalink)
-        elif key == 'C':
+        elif key == 'l':
             url = "http://m.reddit.com" + self.story.permalink
             os.system("lynx -accept_all_cookies " + url)
         else:
@@ -90,7 +90,7 @@ class MainWindow(object):
             subreddit_text = "/r/front_page"
         else:
             subreddit_text = "/r/" + self.__subreddit
-        status = "[{0}] o/O:open c/C:comment s:subreddit u:refresh j/k:scroll q:quit".format(subreddit_text)
+        status = "[{0}] o/O:open h/l:comment s:subreddit u:refresh j/k:scroll q:quit".format(subreddit_text)
         return status
     
     def set_status(self, message=None):
