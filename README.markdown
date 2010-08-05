@@ -23,6 +23,6 @@ Keys
 Requirements
 ------------
 
- * [python 2.7](http://www.python.org/download/releases/2.7/)
+ * python 2.6 or higher (unit tests require [2.7](http://www.python.org/download/releases/2.7/))
  * lynx if you want the ability to open links with it
  * "light on dark" terminal color scheme
