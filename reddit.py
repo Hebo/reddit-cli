@@ -90,7 +90,7 @@ class MainWindow(object):
             subreddit_text = "/r/front_page"
         else:
             subreddit_text = "/r/" + self.__subreddit
-        status = "[{0}] o/O:open h/l:comment s:subreddit u:refresh j/k:scroll q:quit".format(subreddit_text)
+        status = "[{0}] ?: help".format(subreddit_text)
         return status
     
     def set_status(self, message=None):
@@ -161,6 +161,8 @@ def main():
                 body.refresh()
             elif key == 'b': # boss mode
                 os.system("man python")
+            elif key == '?': # help mode
+                os.system("less -Ce README.markdown")
             elif key == 'q': # quit
                 raise urwid.ExitMainLoop()
             return keys
