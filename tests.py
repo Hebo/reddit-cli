@@ -33,7 +33,19 @@ class TestMainWindow(unittest.TestCase):
 
         
 class TestStory(unittest.TestCase):
-    pass
+
+    def setUp(self):
+        self.main_window = reddit.MainWindow()
+
+    def testFormatLineSize(self):
+        """format_lines should adjust line width"""
+        self.main_window.listings[0].original_widget.story.object['title'] = "123456789 " * 10
+        lines = self.main_window.listings[0].original_widget.story.format_lines(70)
+        self.assertLessEqual( len(lines[0]), 70, lines[0])
+        lines = self.main_window.listings[0].original_widget.story.format_lines(40)
+        self.assertLessEqual( len(lines[0]), 40, lines[0])
+        self.assertLessEqual( len(lines[1]), 40, lines[1])
+        
 
 
 class TestDownloadStories(unittest.TestCase):

@@ -7,7 +7,6 @@ class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
     def __init__(self, story):
         self.story = story
-        self.lines = story.format_lines()
         
     def selectable(self):
         return True
@@ -17,11 +16,12 @@ class Listing(urwid.FlowWidget):
 
     def render(self, size, focus=False):
         (maxcol,) = size
+        lines = self.story.format_lines(maxcol)
         if focus:
             pass
         # pad lines to column width
         fill = lambda x: x.ljust(maxcol)
-        return urwid.TextCanvas(text=list(map(fill, self.lines)))
+        return urwid.TextCanvas(text=list(map(fill, lines)))
 
     def keypress(self, size, key):
         if key in ('o', 'enter'):

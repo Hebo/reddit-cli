@@ -47,10 +47,10 @@ class Story:
         else:
             raise AttributeError, name
 
-    def format_lines(self):
-        """prepare story as a two-string tuple"""
+    def format_lines(self, length):
+        """prepare story as a two-string tuple of correct length"""
         line1 = "{0}".format(unescape(
-                            smart_truncate(self.title.encode('utf-8'), length=76)
+                            smart_truncate(self.title.encode('utf-8'), length=length-3)
                             ))
         line2 = "{0} points   {1} comments   {2}   {3}".format(
                                     self.score,
@@ -58,7 +58,7 @@ class Story:
                                     self.domain,
                                     "/r/" + self.subreddit,
                                     )
-        return (line1, line2)
+        return (line1, line2[:length])
 
 
 class BadSubredditError(Exception):
