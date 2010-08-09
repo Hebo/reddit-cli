@@ -47,7 +47,6 @@ class TestStory(unittest.TestCase):
         self.assertLessEqual( len(lines[1]), 40, lines[1])
         
 
-
 class TestDownloadStories(unittest.TestCase):
     
     def testBadSubredditError(self):

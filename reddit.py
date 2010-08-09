@@ -52,7 +52,7 @@ class MainWindow(object):
         
         # Prep header and footer ui widgets 
         self.header = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
-        self.footer_content = urwid.Text(('footer', "")) 
+        self.footer_content = urwid.Text(('footer', ""), wrap='clip') 
         self.footer = urwid.Padding(self.footer_content, left=1, right=1)
         
         self.frame = urwid.Frame(   self.__get_widget(),
@@ -68,7 +68,11 @@ class MainWindow(object):
     def __load_stories(self):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
-        for s in download_stories(self.__subreddit)['stories']:
+        data =  download_stories(self.__subreddit)
+        
+        self.pages['next'] = data['next']
+        self.pages['prev'] = data['prev']
+        for s in data['stories']:
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
         
@@ -91,7 +95,7 @@ class MainWindow(object):
             subreddit_text = "/r/front_page"
         else:
             subreddit_text = "/r/" + self.__subreddit
-        status = "[{0}] ?: help".format(subreddit_text)
+        status = "[{0}] ?: help n/m:pagination".format(subreddit_text)
         return status
     
     def switch_page(self, direction):
@@ -99,7 +103,7 @@ class MainWindow(object):
         if direction == "prev":
             pass
         elif direction == "next":
-            pass
+            self.set_status(message=self.pages['next'])
         else:
             raise Exception, "Direction must be 'prev' or 'next'"
     
@@ -167,6 +171,9 @@ def main():
             elif key in ('j','k'):
                 direction = 'down' if key == 'j' else 'up'
                 return [direction]
+            elif key in ('n','m'):
+                direction = 'prev' if key == 'n' else 'next'
+                body.switch_page(direction)
             elif key == 'u':
                 body.refresh()
             elif key == 'b': # boss mode

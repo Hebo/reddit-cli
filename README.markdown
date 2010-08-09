@@ -19,6 +19,7 @@ Keys
  * `u` : refresh
  * `s` : switch subreddit
  * `j,k` or arrow keys : scroll
+ * `n,m` : previous and next page, respectively
 
 Requirements
 ------------
