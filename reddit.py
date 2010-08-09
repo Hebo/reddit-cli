@@ -47,6 +47,7 @@ class MainWindow(object):
     def __init__(self):
         self.listings = []
         self.__subreddit = None
+        self.pages = {"next": None, "prev": None}
         self.__load_stories()
         
         # Prep header and footer ui widgets 
@@ -67,7 +68,7 @@ class MainWindow(object):
     def __load_stories(self):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
-        for s in download_stories(self.__subreddit):
+        for s in download_stories(self.__subreddit)['stories']:
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
         
@@ -92,6 +93,15 @@ class MainWindow(object):
             subreddit_text = "/r/" + self.__subreddit
         status = "[{0}] ?: help".format(subreddit_text)
         return status
+    
+    def switch_page(self, direction):
+        """load stories from the previous or next page"""
+        if direction == "prev":
+            pass
+        elif direction == "next":
+            pass
+        else:
+            raise Exception, "Direction must be 'prev' or 'next'"
     
     def set_status(self, message=None):
         """write message on footer or else default status string"""

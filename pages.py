@@ -87,6 +87,10 @@ def download_stories(subreddit):
     stories = []
     for i in stories_raw['data']['children']:
         stories.append(Story(i['data']))
-    return stories
+    
+    # Identifier for last/first story on the page for pagination
+    next = stories_raw['data']['after']
+    prev = stories_raw['data']['before']
+    return { "stories": stories, "next": next, "prev": prev }
     
     

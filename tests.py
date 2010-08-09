@@ -58,11 +58,11 @@ class TestDownloadStories(unittest.TestCase):
 
     def testReturnList(self):
         """should return a list"""
-        self.assertIsInstance(pages.download_stories(None), list)
+        self.assertIsInstance(pages.download_stories(None)['stories'], list)
 
     def testReturnStories(self):
         """should return a list of stories"""
-        for s in pages.download_stories(None):
+        for s in pages.download_stories(None)['stories']:
             self.assertIsInstance(s, pages.Story)
      
         
