@@ -3,6 +3,9 @@ import webbrowser
 import os
 from pages import Story, download_stories, BadSubredditError, Navigation
 
+# Main loop is global so MainWindow can update the screen asynchronously
+main_loop = None
+
 class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
     def __init__(self, story):
@@ -61,9 +64,18 @@ class MainWindow(object):
     
     def set_subreddit(self, subreddit):
         """switch subreddits"""
-        self.__subreddit = subreddit
         self.set_status("Loading subreddit: /r/{0}".format(subreddit))
-        self.refresh()
+        old_subreddit = self.__subreddit
+        self.__subreddit = subreddit
+        try:
+            self.__load_stories()
+        except BadSubredditError:
+            self.set_status("Error loading subreddit /r/{0}!".format(subreddit))
+            self.__subreddit = old_subreddit
+            self.__load_stories()
+        main_widget = self.__get_widget()
+        self.frame.set_body(main_widget)
+        self.set_status()
                                            
     def __load_stories(self, direction=None):
         """load stories from (sub)reddit at specified marker and store Listings"""
@@ -100,13 +112,16 @@ class MainWindow(object):
     def switch_page(self, direction):
         """load stories from the previous or next page"""
         if direction == "prev":
+            self.set_status("Loading...")
             self.__load_stories(direction=direction)
         elif direction == "next":
+            self.set_status("Loading...")
             self.__load_stories(direction=direction)
         else:
             raise Exception, "Direction must be 'prev' or 'next'"
         main_widget = self.__get_widget()
         self.frame.set_body(main_widget)
+        self.set_status()
     
     def set_status(self, message=None):
         """write message on footer or else default status string"""
@@ -116,8 +131,13 @@ class MainWindow(object):
             status = message
         self.footer_content.set_text(('footer', status))
         
+        global main_loop
+        if not main_loop is None:
+            main_loop.draw_screen()
+        
     def refresh(self):
         """reload stories in main window"""
+        self.set_status("Reloading...")
         try:
             self.__load_stories()
         except BadSubredditError:
@@ -150,12 +170,17 @@ def main():
         if keys in (['enter'],[]):
             if keys == ['enter']:
                 if textentry.get_text()[0] != '':
+                    # We set the footer twice because the first time we
+                    # want the updated status text (loading...) to show 
+                    # immediately, and the second time as a catch-all
+                    body.frame.set_footer(body.footer)
                     body.set_subreddit(textentry.edit_text)
                     textentry.set_edit_text('')
             # Restore original status footer
             body.frame.set_footer(body.footer)
             body.frame.set_focus('body')
-            loop.input_filter = input_handler
+            global main_loop
+            main_loop.input_filter = input_handler
             return
         return keys
         
@@ -167,7 +192,8 @@ def main():
                 textentry.set_caption(('textentry', ' [subreddit] ?>'))
                 body.frame.set_footer(urwid.Padding(textentry, left=4))
                 body.frame.set_focus('footer')
-                loop.input_filter = edit_handler
+                global main_loop
+                main_loop.input_filter = edit_handler
                 return
             elif key in ('j','k'):
                 direction = 'down' if key == 'j' else 'up'
@@ -186,8 +212,9 @@ def main():
             return keys
 
     # Start ui 
-    loop = urwid.MainLoop(body.frame, palette, input_filter=input_handler)
-    loop.run()
+    global main_loop
+    main_loop = urwid.MainLoop(body.frame, palette, input_filter=input_handler)
+    main_loop.run()
 
 if __name__ == "__main__":
     main()
