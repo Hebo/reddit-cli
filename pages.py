@@ -86,17 +86,21 @@ def download_stories(subreddit, nav=None, direction=None):
             raise Exception, "Bad pagination direction given"    
         
     stream = None
+    json_data = None
     try:
         stream = urllib2.urlopen(url)
+        json_data = stream.read()
     except urllib2.HTTPError as err:
         if err.getcode() in (400,404):
             raise BadSubredditError
         else:
             raise
-    if re.search(r'/search\?q=', stream.url):
+    if json_data == "{error: 404}":
+        raise BadSubredditError
+    elif re.search(r'/search\?q=', stream.url):
         raise BadSubredditError
     
-    stories_raw = json.loads(stream.read())
+    stories_raw = json.loads(json_data)
     stories = []
     for i in stories_raw['data']['children']:
         stories.append(Story(i['data']))

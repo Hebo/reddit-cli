@@ -64,9 +64,12 @@ class MainWindow(object):
     
     def set_subreddit(self, subreddit):
         """switch subreddits"""
-        self.set_status("Loading subreddit: /r/{0}".format(subreddit))
         old_subreddit = self.__subreddit
-        self.__subreddit = subreddit
+        if subreddit == "fp":
+            self.__subreddit = None
+        else:
+            self.set_status("Loading subreddit: /r/{0}".format(subreddit))
+            self.__subreddit = subreddit
         try:
             self.__load_stories()
         except BadSubredditError:
@@ -189,7 +192,7 @@ def main():
         for key in keys:
             if key == 's':
                 # Replace status footer wth edit widget
-                textentry.set_caption(('textentry', ' [subreddit] ?>'))
+                textentry.set_caption(('textentry', ' [subreddit?] ("fp" for the front page) :>'))
                 body.frame.set_footer(urwid.Padding(textentry, left=4))
                 body.frame.set_focus('footer')
                 global main_loop
