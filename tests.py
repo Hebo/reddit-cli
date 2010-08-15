@@ -49,9 +49,9 @@ class TestStory(unittest.TestCase):
 class TestNavigation(unittest.TestCase):
     def testNavigationCreation(self):
         """Navigation.__init__() should set attributes properly"""
-        nav = pages.Navigation("abc", "xyx")
-        self.assertEquals(nav.prev, "abc")
-        self.assertEquals(nav.next, "xyx")
+        nav = pages.Navigation("abc", 0, ["start"])
+        self.assertEquals(nav.next, "abc")
+        self.assertEquals(nav.count, 0)
         
 
 class TestDownloadStories(unittest.TestCase):
@@ -64,11 +64,11 @@ class TestDownloadStories(unittest.TestCase):
 
     def testReturnList(self):
         """should return a list"""
-        self.assertIsInstance(pages.download_stories(None)['stories'], list)
+        self.assertIsInstance(pages.download_stories(None)[0], list)
 
     def testReturnStories(self):
         """should return a list of stories"""
-        for s in pages.download_stories(None, None, None)['stories']:
+        for s in pages.download_stories(None, None, None)[0]:
             self.assertIsInstance(s, pages.Story)
      
         

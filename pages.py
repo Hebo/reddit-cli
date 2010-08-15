@@ -66,8 +66,10 @@ class BadSubredditError(Exception):
 
 class Navigation:
     """handles the navigation properties of a single page"""
-    def __init__(self, prev, next):
-        self.next, self.prev = next, prev
+    def __init__(self, next, count, stack):
+        self.next = next
+        self.count = count
+        self.stack = stack # store id of the last story on each page in a stack
         
     
 def download_stories(subreddit, nav=None, direction=None):
@@ -77,13 +79,24 @@ def download_stories(subreddit, nav=None, direction=None):
     else: 
         url = "http://www.reddit.com/r/" + subreddit + "/.json"
     
-    if not direction is None and not nav is None:
+    if nav is None:
+        nav = Navigation(None, 0, ["start"])
+    
+    if not direction is None:
         if direction == "prev":
-            url += "?before={0}".format(nav.prev)
+            # the end of the stack marks the start of the current page,
+            # so we discard it and get a reference to the last page
+            if not nav.stack[-1] == "start":
+                nav.count -= 25
+                nav.stack.pop()
+                prev = nav.stack[-1]
+                url += "?count={0}&after={1}".format(nav.count, prev)
         elif direction == "next":
-            url += "?after={0}".format(nav.next)
+            nav.stack.append(nav.next)
+            nav.count += 25
+            url += "?count={0}&after={1}".format(nav.count, nav.next)
         else:
-            raise Exception, "Bad pagination direction given"    
+            raise Exception, "Bad paging direction given"
         
     stream = None
     json_data = None
@@ -106,8 +119,7 @@ def download_stories(subreddit, nav=None, direction=None):
         stories.append(Story(i['data']))
     
     # Identifier for last/first story on the page for pagination
-    next = stories_raw['data']['after']
-    prev = stories_raw['data']['before']
-    return { "stories": stories, "next": next, "prev": prev }
+    nav.next = stories_raw['data']['after']
+    return ( stories, nav )
     
     

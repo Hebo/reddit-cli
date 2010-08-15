@@ -64,6 +64,7 @@ class MainWindow(object):
     
     def set_subreddit(self, subreddit):
         """switch subreddits"""
+        self.nav = None
         old_subreddit = self.__subreddit
         if subreddit == "fp":
             self.__subreddit = None
@@ -81,12 +82,12 @@ class MainWindow(object):
         self.set_status()
                                            
     def __load_stories(self, direction=None):
-        """load stories from (sub)reddit at specified marker and store Listings"""
+        """load stories from (sub)reddit and store Listings"""
         self.listings = []
         data =  download_stories(self.__subreddit, self.nav, direction)
         
-        self.nav = Navigation(data['prev'], data['next'])
-        for s in data['stories']:
+        self.nav = data[1]
+        for s in data[0]:
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
         
@@ -109,16 +110,16 @@ class MainWindow(object):
             subreddit_text = "/r/front_page"
         else:
             subreddit_text = "/r/" + self.__subreddit
-        status = "[{0}] ?: help n/m:pagination".format(subreddit_text)
+        status = "[{0}] ({1}) ?: help n/m:pagination".format(self.nav.count/25+1, subreddit_text)
         return status
     
     def switch_page(self, direction):
         """load stories from the previous or next page"""
         if direction == "prev":
-            self.set_status("Loading...")
+            self.set_status("(<) Loading...")
             self.__load_stories(direction=direction)
         elif direction == "next":
-            self.set_status("Loading...")
+            self.set_status("(>) Loading...")
             self.__load_stories(direction=direction)
         else:
             raise Exception, "Direction must be 'prev' or 'next'"
@@ -141,6 +142,7 @@ class MainWindow(object):
     def refresh(self):
         """reload stories in main window"""
         self.set_status("Reloading...")
+        self.nav = None
         try:
             self.__load_stories()
         except BadSubredditError:
