@@ -1,7 +1,7 @@
 import urwid
 import webbrowser
 import os
-from pages import Story, download_stories, BadSubredditError
+from pages import Story, download_stories, BadSubredditError, Navigation
 
 class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
@@ -47,7 +47,7 @@ class MainWindow(object):
     def __init__(self):
         self.listings = []
         self.__subreddit = None
-        self.pages = {"next": None, "prev": None}
+        self.nav = None
         self.__load_stories()
         
         # Prep header and footer ui widgets 
@@ -65,13 +65,12 @@ class MainWindow(object):
         self.set_status("Loading subreddit: /r/{0}".format(subreddit))
         self.refresh()
                                            
-    def __load_stories(self):
-        """load stories from (sub)reddit and store Listings"""
+    def __load_stories(self, direction=None):
+        """load stories from (sub)reddit at specified marker and store Listings"""
         self.listings = []
-        data =  download_stories(self.__subreddit)
+        data =  download_stories(self.__subreddit, self.nav, direction)
         
-        self.pages['next'] = data['next']
-        self.pages['prev'] = data['prev']
+        self.nav = Navigation(data['prev'], data['next'])
         for s in data['stories']:
             current = Listing(s)
             self.listings.append(urwid.Padding(current, left=1, right=1))
@@ -101,11 +100,13 @@ class MainWindow(object):
     def switch_page(self, direction):
         """load stories from the previous or next page"""
         if direction == "prev":
-            pass
+            self.__load_stories(direction=direction)
         elif direction == "next":
-            self.set_status(message=self.pages['next'])
+            self.__load_stories(direction=direction)
         else:
             raise Exception, "Direction must be 'prev' or 'next'"
+        main_widget = self.__get_widget()
+        self.frame.set_body(main_widget)
     
     def set_status(self, message=None):
         """write message on footer or else default status string"""

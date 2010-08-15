@@ -64,14 +64,27 @@ class Story:
 class BadSubredditError(Exception):
     pass
 
+class Navigation:
+    """handles the navigation properties of a single page"""
+    def __init__(self, prev, next):
+        self.next, self.prev = next, prev
+        
     
-def download_stories(subreddit):
+def download_stories(subreddit, nav=None, direction=None):
     """download json from reddit and return list of stories"""
     if subreddit is None: 
         url = "http://www.reddit.com/.json"
     else: 
         url = "http://www.reddit.com/r/" + subreddit + "/.json"
     
+    if not direction is None and not nav is None:
+        if direction == "prev":
+            url += "?before={0}".format(nav.prev)
+        elif direction == "next":
+            url += "?after={0}".format(nav.next)
+        else:
+            raise Exception, "Bad pagination direction given"    
+        
     stream = None
     try:
         stream = urllib2.urlopen(url)
