@@ -1,11 +1,12 @@
 reddit-cli
 ==========
 
-reddit-cli is a tool that lets you browse reddit.com and follow links from a command line shell. reddit-cli supports subreddits, reading comments and even has a boss key!
+reddit-cli is a tool that lets you browse reddit.com and follow links from a command line shell. reddit-cli supports logins, subreddits, reading comments and even has a boss key!
 
 Usage
 ----- 
 Run with `./reddit-cli`
+Login with `./reddit-cli -u yourusername -p yourpassword`
 
 Keys
 ----
