@@ -6,6 +6,7 @@ reddit-cli is a tool that lets you browse reddit.com and follow links from a com
 Usage
 ----- 
 Run with `./reddit-cli`
+
 Login with `./reddit-cli -u yourusername -p yourpassword`
 
 Keys
