@@ -6,8 +6,6 @@ from optparse import OptionParser # argparse is 2.7-only
 
 # Main loop is global so MainWindow can update the screen asynchronously
 main_loop = None
-# Handles page downloads and cookies
-handler = None
 
 class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
@@ -51,6 +49,8 @@ class Listing(urwid.FlowWidget):
 class MainWindow(object):
     """manages main window elements"""
     def __init__(self):
+        # Handles page downloads and cookies                            
+        self.handler = RedditHandler()
         self.listings = []
         self.__subreddit = None
         self.nav = None
@@ -64,7 +64,12 @@ class MainWindow(object):
         self.frame = urwid.Frame(   self.__get_widget(),
                                     header=self.header, 
                                     footer=self.footer )
+
     
+    def login(self, username, password):
+        """attempt to login"""
+        return self.handler.login(username, password)
+        
     def set_subreddit(self, subreddit):
         """switch subreddits"""
         self.nav = None
@@ -87,8 +92,7 @@ class MainWindow(object):
     def __load_stories(self, direction=None):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
-        global handler
-        data = handler.download_stories(self.__subreddit, self.nav, direction)
+        data = self.handler.download_stories(self.__subreddit, self.nav, direction)
         
         self.nav = data[1]
         for s in data[0]:
@@ -180,18 +184,16 @@ def main():
         exit()
         
     print "Loading..."
-    global handler
-    handler = RedditHandler()
     
+    body = MainWindow()
     if options.username:
         print "[Logging in]"
-        if handler.login(options.username, options.password):
+        if body.login(options.username, options.password):
             print "[Login Successful]"
         else:
             print "[Login Failed]"
             exit()
-    
-    body = MainWindow()
+            
     body.refresh()
         
     def edit_handler(keys, raw):

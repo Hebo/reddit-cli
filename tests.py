@@ -58,17 +58,20 @@ class TestDownloadStories(unittest.TestCase):
     
     def testBadSubredditError(self):
         """should raise a BadSubredditError"""
-        self.assertRaises(pages.BadSubredditError, pages.download_stories, "qwer345g63")
-        self.assertRaises(pages.BadSubredditError, pages.download_stories, "qwer3 45g 63")
-        self.assertRaises(pages.BadSubredditError, pages.download_stories, "78b@$@#$@#   @ 42 4 7cs")
+        handler = pages.RedditHandler()
+        self.assertRaises(pages.BadSubredditError, handler.download_stories, "qwer345g63")
+        self.assertRaises(pages.BadSubredditError, handler.download_stories, "qwer3 45g 63")
+        self.assertRaises(pages.BadSubredditError, handler.download_stories, "78b@$@#$@#   @ 42 4 7cs")
 
     def testReturnList(self):
         """should return a list"""
-        self.assertIsInstance(pages.download_stories(None)[0], list)
+        handler = pages.RedditHandler()
+        self.assertIsInstance(handler.download_stories(None)[0], list)
 
     def testReturnStories(self):
         """should return a list of stories"""
-        for s in pages.download_stories(None, None, None)[0]:
+        handler = pages.RedditHandler()
+        for s in handler.download_stories(None, None, None)[0]:
             self.assertIsInstance(s, pages.Story)
      
         
