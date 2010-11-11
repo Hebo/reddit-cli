@@ -73,7 +73,14 @@ class TestDownloadStories(unittest.TestCase):
         handler = pages.RedditHandler()
         for s in handler.download_stories(None, None, None)[0]:
             self.assertIsInstance(s, pages.Story)
-     
+
+class TestLogin(unittest.TestCase):
+
+    def testInvalidLogin(self):
+        """login attempt should fail"""
+        handler = pages.RedditHandler()
+        self.assertFalse(handler.login("gsdfgsdfg", "sdfgsfgsgf"))
+             
         
 if __name__ == "__main__":
     unittest.main()

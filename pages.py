@@ -113,7 +113,6 @@ class RedditHandler:
         self.user = None
 
     def login(self, user, passwd):
-
         self.user = user
 
         params = urllib.urlencode({
