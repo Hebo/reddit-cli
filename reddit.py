@@ -1,10 +1,13 @@
 import urwid
 import webbrowser
 import os
-from pages import Story, download_stories, BadSubredditError, Navigation
+from pages import Story, RedditHandler, BadSubredditError, Navigation
+from optparse import OptionParser # argparse is 2.7-only
 
 # Main loop is global so MainWindow can update the screen asynchronously
 main_loop = None
+# Handles page downloads and cookies
+handler = None
 
 class Listing(urwid.FlowWidget):
     """contains a single story and manages its events"""
@@ -84,7 +87,8 @@ class MainWindow(object):
     def __load_stories(self, direction=None):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
-        data =  download_stories(self.__subreddit, self.nav, direction)
+        global handler
+        data = handler.download_stories(self.__subreddit, self.nav, direction)
         
         self.nav = data[1]
         for s in data[0]:
@@ -166,7 +170,27 @@ def main():
     textentry = urwid.Edit()
     assert textentry.get_text() == ('', []), textentry.get_text()   
     
+    parser = OptionParser()
+    parser.add_option("-u", "--username")
+    parser.add_option("-p", "--password")
+    (options, args) = parser.parse_args()
+    #import pdb; pdb.set_trace()
+    if options.username and not options.password:
+        print "If you specify a username, you must also specify a password"
+        exit()
+        
     print "Loading..."
+    global handler
+    handler = RedditHandler()
+    
+    if options.username:
+        print "[Logging in]"
+        if handler.login(options.username, options.password):
+            print "[Login Successful]"
+        else:
+            print "[Login Failed]"
+            exit()
+    
     body = MainWindow()
     body.refresh()
         
