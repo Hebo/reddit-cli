@@ -113,7 +113,6 @@ class RedditHandler:
         self.user = None
 
     def login(self, user, passwd):
-        self.user = user
 
         params = urllib.urlencode({
             'id' : '#login_login-main',
@@ -132,7 +131,8 @@ class RedditHandler:
         except Exception, e:
             print "Error: %s", e.message
             return False
-
+        
+        self.user = user
         return True
             
     def download_stories(self, subreddit, nav=None, direction=None):
@@ -175,7 +175,7 @@ class RedditHandler:
             raise BadSubredditError
         elif re.search(r'/search\?q=', stream.url):
             raise BadSubredditError
-    
+        
         stories_raw = json.loads(json_data)
         stories = []
         for i in stories_raw['data']['children']:

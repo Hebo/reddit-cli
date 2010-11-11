@@ -57,7 +57,7 @@ class MainWindow(object):
         self.__load_stories()
         
         # Prep header and footer ui widgets 
-        self.header = urwid.Text(('header', "reddit-cli - http://github.com/cev/reddit-cli"), align='center')
+        self.__update_header()
         self.footer_content = urwid.Text(('footer', ""), wrap='clip') 
         self.footer = urwid.Padding(self.footer_content, left=1, right=1)
         
@@ -68,7 +68,11 @@ class MainWindow(object):
     
     def login(self, username, password):
         """attempt to login"""
-        return self.handler.login(username, password)
+        login_result = self.handler.login(username, password)
+        if login_result:
+            self.__update_header()
+        return login_result
+      
         
     def set_subreddit(self, subreddit):
         """switch subreddits"""
@@ -88,7 +92,19 @@ class MainWindow(object):
         main_widget = self.__get_widget()
         self.frame.set_body(main_widget)
         self.set_status()
-                                           
+    
+    def __update_header(self):
+        """set the titlebar to the currently logged in user"""
+        if self.handler.user:
+            header_text = "[{0}] - reddit-cli - github.com/cev/reddit-cli".format(self.handler.user)
+        else:
+            header_text = "reddit-cli - github.com/cev/reddit-cli"
+        self.header = urwid.Text(('header',
+                                header_text),
+                                align='center')
+        if hasattr(self, 'frame'):
+            self.frame.set_header(self.header)                                   
+ 
     def __load_stories(self, direction=None):
         """load stories from (sub)reddit and store Listings"""
         self.listings = []
@@ -178,7 +194,7 @@ def main():
     parser.add_option("-u", "--username")
     parser.add_option("-p", "--password")
     (options, args) = parser.parse_args()
-    #import pdb; pdb.set_trace()
+    
     if options.username and not options.password:
         print "If you specify a username, you must also specify a password"
         exit()
